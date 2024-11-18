@@ -12,6 +12,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List toDoLists = [];
+  final TextEditingController _textController =  TextEditingController();
 
   @override
   void initState() {
@@ -23,6 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    _textController.dispose();
     super.dispose();
   }
 
@@ -132,17 +134,49 @@ class _HomeScreenState extends State<HomeScreen> {
                 bottom: 30,
                 right: 50,
                 child: AddButton(
-                  onPressed: () {
-                    setState(() {
-                      toDoLists.add("+++++++++");
-                    });
-                  },
-                ),
-              ),
+                  onPressed: _showAddToDoDialog))
+
             ],
           )
         ],
-      ),
+      )
     );
   }
+  void _showAddToDoDialog() {
+    showDialog(context: context, builder: (BuildContext context){
+      return AlertDialog(
+        title:  Text('할 일 추가'),
+        content:  TextField(
+          controller: _textController,
+          decoration: InputDecoration(
+            hintText: '할 일을 입력하세요',
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.grey), // 비활성화 상태 색상
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.black), // 활성화 상태 색상
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () {
+            Navigator.of(context).pop();
+          }, child: Text('취소',style: TextStyle(color: Colors.black),)),
+          TextButton(onPressed: () {
+            if(_textController.text.isNotEmpty){
+              setState(() {
+                toDoLists.add(_textController.text);
+                _textController.clear();
+              });
+              Navigator.of(context).pop();
+            }
+          },
+              child: Text('추가',
+              style: TextStyle(color: Colors.black)))
+        ],
+      );
+    });
+  }
 }
+
+
